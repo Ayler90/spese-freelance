@@ -97,13 +97,16 @@ export default function Dashboard({ c }: Props) {
       </div>
 
       {/* Profit bar */}
-      <div className="profit-bar" style={{ background: pos ? '#ecfdf5' : '#fef2f2' }}>
+      <div className="profit-bar" style={{
+        background: pos ? '#f0fdf4' : '#fff5f5',
+        borderColor: pos ? '#bbf7d0' : '#fecaca',
+      }}>
         <span className="emoji">{pos ? '📈' : '📉'}</span>
         <div>
-          <div className="title" style={{ color: pos ? '#065f46' : '#991b1b' }}>
+          <div className="title" style={{ color: pos ? '#156686' : '#dc2626' }}>
             {pos ? 'Sei in guadagno!' : 'Attenzione: sei in perdita'}
           </div>
-          <div className="detail" style={{ color: pos ? '#047857' : '#b91c1c' }}>
+          <div className="detail" style={{ color: pos ? '#4a6670' : '#b91c1c' }}>
             {pos
               ? `Dopo le spese ti restano ${fmt(c.totNetto)} su ${c.active} mesi attivi`
               : `Le spese superano il fatturato di ${fmt(Math.abs(c.totNetto))}`}
