@@ -43,6 +43,7 @@ export interface MonthCalc {
 export interface CalcResult {
   months: MonthCalc[];
   totFat: number;
+  prevFat: number;
   totCon: number;
   totVid: number;
   totSpe: number;

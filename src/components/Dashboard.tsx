@@ -94,6 +94,7 @@ export default function Dashboard({ c }: Props) {
           sub={`Media ${fmt(c.avgNet)}/mese`}
           color={pos ? '#10b981' : '#ef4444'} icon={pos ? '✅' : '⚠️'}
         />
+        <YoyCard totFat={c.totFat} prevFat={c.prevFat} />
       </div>
 
       {/* Profit bar */}
@@ -166,6 +167,27 @@ export default function Dashboard({ c }: Props) {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+interface YoyCardProps { totFat: number; prevFat: number; }
+function YoyCard({ totFat, prevFat }: YoyCardProps) {
+  const hasPrev = prevFat > 0;
+  const diff = totFat - prevFat;
+  const pct = hasPrev ? ((diff / prevFat) * 100) : 0;
+  const up = diff >= 0;
+  const color = !hasPrev ? '#7a9ea5' : up ? '#10b981' : '#ef4444';
+  const sign = up ? '+' : '';
+  const sub = hasPrev
+    ? `${sign}${fmt(diff)} rispetto all'anno prec.`
+    : 'Nessun dato anno precedente';
+  const value = hasPrev ? `${sign}${pct.toFixed(1)}%` : '—';
+  return (
+    <div className="stat-card" style={{ '--card-color': color } as React.CSSProperties}>
+      <div className="label"><span className="icon">{!hasPrev ? '📅' : up ? '📈' : '📉'}</span>Vs anno precedente</div>
+      <div className="value">{value}</div>
+      <div className="sub">{sub}</div>
     </div>
   );
 }

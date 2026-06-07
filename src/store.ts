@@ -84,9 +84,13 @@ export function calc(data: AppData, year: number): CalcResult {
     totSpe = s('spese'), totImp = s('impTot'), totInps = s('inps'),
     totImpSost = s('impSost'), totTasse = s('tasse'), totNetto = s('netto');
 
+  const prevYd: MonthData[] = data.years[year - 1] || emptyYear();
+  const prevFat = prevYd.reduce((a, m) => a + m.consulenza + m.videocorsi, 0);
+
   return {
     months, totFat, totCon, totVid, totSpe, totImp, totInps, totImpSost, totTasse, totNetto,
-    avgFat: totFat / active, avgSpe: totSpe / active, avgNet: totNetto / active, active, yp
+    avgFat: totFat / active, avgSpe: totSpe / active, avgNet: totNetto / active, active, yp,
+    prevFat
   };
 }
 
