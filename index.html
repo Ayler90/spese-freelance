@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Freelance Tracker — Regime Forfettario</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #fff1f2 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #1e293b;
+  }
+  .header {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    padding: 32px 24px 24px;
+    color: #fff;
+  }
+  .header-inner { max-width: 1100px; margin: 0 auto; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+  .header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  .header .subtitle { margin-top: 6px; opacity: 0.8; font-size: 14px; }
+  .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  select, .btn-header {
+    padding: 8px 14px; border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.15);
+    color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; outline: none;
+  }
+  select option { color: #1e293b; }
+  .btn-header { font-size: 13px; padding: 8px 16px; }
+  .export-bar {
+    margin-top: 16px; padding: 16px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 12px; display: none; gap: 12px; flex-wrap: wrap; align-items: center;
+  }
+  .export-bar.active { display: flex; }
+  .btn-export {
+    padding: 8px 20px; border-radius: 8px; border: none;
+    background: #fff; color: #6366f1; font-weight: 600;
+    cursor: pointer; font-size: 13px;
+  }
+  .btn-import {
+    padding: 8px 20px; border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.4);
+    background: transparent; color: #fff; font-weight: 600;
+    cursor: pointer; font-size: 13px;
+  }
+  .tabs {
+    margin-top: 20px; display: flex; gap: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 12px; padding: 4px; width: fit-content;
+  }
+  .tab {
+    padding: 10px 20px; border: none; border-radius: 10px;
+    cursor: pointer; font-weight: 600; font-size: 14px;
+    background: transparent; color: rgba(255,255,255,0.75);
+    transition: all 0.2s;
+  }
+  .tab.active { background: #6366f1; color: #fff; }
+  .content { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  .cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-card {
+    background: #fff; border-radius: 16px; padding: 20px 24px;
+    flex: 1 1 200px; min-width: 200px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-left: 4px solid var(--card-color);
+  }
+  .stat-card .label {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    font-size: 13px; color: #94a3b8; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .stat-card .label .icon { font-size: 20px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: var(--card-color); line-height: 1.2; }
+  .stat-card .sub { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+  .profit-bar {
+    border-radius: 14px; padding: 16px 24px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .profit-bar .emoji { font-size: 28px; }
+  .profit-bar .title { font-weight: 700; font-size: 16px; }
+  .profit-bar .detail { font-size: 13px; margin-top: 2px; }
+  .charts-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .chart-box {
+    background: #fff; border-radius: 16px; padding: 20px 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .chart-box h3 {
+    margin: 0 0 16px 8px; font-size: 15px; font-weight: 700; color: #475569;
+  }
+  .chart-main { flex: 2 1 500px; }
+  .chart-side { flex: 1 1 280px; display: flex; flex-direction: column; align-items: center; }
+  .chart-side h3 { align-self: flex-start; padding-left: 8px; margin-bottom: 8px; }
+  .empty-chart { flex: 1; display: flex; align-items: center; color: #94a3b8; font-size: 14px; }
+  .info-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .info-box {
+    flex: 2 1 400px; background: #fff; border-radius: 16px; padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .info-box h3 { margin: 0 0 16px; font-size: 15px; font-weight: 700; color: #475569; }
+  .info-box p { margin: 0 0 10px; font-size: 13px; line-height: 1.8; color: #475569; }
+  .info-box .note { font-size: 12px; color: #94a3b8; font-style: italic; margin: 0; }
+  .table-wrap {
+    background: #fff; border-radius: 16px; padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .table-wrap h2 { margin: 0 0 8px; font-size: 20px; font-weight: 700; }
+  .table-wrap .desc { margin: 0 0 20px; font-size: 13px; color: #94a3b8; }
+  .scroll-x { overflow-x: auto; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  th {
+    padding: 12px 8px; font-size: 12px; color: #94a3b8; font-weight: 600;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  td { padding: 8px; }
+  tbody tr:nth-child(even) { background: #fafbfc; }
+  tfoot td { padding: 12px 8px; font-weight: 700; border-top: 2px solid #e2e8f0; }
+  .input-cell {
+    width: 100%; padding: 8px 10px;
+    border: 2px solid #e2e8f0; border-radius: 8px;
+    font-size: 14px; text-align: right; outline: none;
+    background: #f8fafc; transition: border 0.2s; box-sizing: border-box;
+  }
+  .input-cell:focus { border-color: #6366f1; }
+  .detail-table th {
+    padding: 12px 6px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.3px; white-space: nowrap;
+  }
+  .detail-table td { padding: 10px 6px; font-size: 13px; }
+  .detail-table tfoot td { padding: 12px 6px; }
+  .summary-card {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 16px; padding: 28px; color: #fff; margin-top: 24px;
+  }
+  .summary-card h3 { margin: 0 0 20px; font-size: 18px; font-weight: 700; }
+  .summary-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;
+  }
+  .summary-item .slabel { font-size: 12px; opacity: 0.7; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-item .svalue { font-size: 22px; font-weight: 700; }
+  canvas { max-width: 100%; }
+  .obj-section { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); margin-bottom: 24px; }
+  .obj-section h2 { margin: 0 0 6px; font-size: 20px; font-weight: 700; }
+  .obj-section .desc { margin: 0 0 20px; font-size: 13px; color: #94a3b8; }
+  .prod-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .prod-row input, .prod-row select {
+    padding: 8px 10px; border: 2px solid #e2e8f0; border-radius: 8px;
+    font-size: 14px; outline: none; background: #f8fafc; transition: border 0.2s;
+  }
+  .prod-row input:focus, .prod-row select:focus { border-color: #6366f1; }
+  .prod-row .prod-name { flex: 2 1 160px; min-width: 120px; }
+  .prod-row .prod-price { flex: 1 1 100px; min-width: 80px; text-align: right; }
+  .prod-row .prod-type { flex: 1 1 140px; min-width: 120px; color: #1e293b; }
+  .btn-add, .btn-remove {
+    padding: 8px 16px; border: none; border-radius: 8px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-add { background: #6366f1; color: #fff; }
+  .btn-add:hover { background: #4f46e5; }
+  .btn-remove { background: #fee2e2; color: #ef4444; padding: 8px 12px; }
+  .btn-remove:hover { background: #fecaca; }
+  .target-input {
+    padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
+    font-size: 20px; font-weight: 700; text-align: right; outline: none;
+    background: #f8fafc; width: 250px; max-width: 100%; transition: border 0.2s;
+  }
+  .target-input:focus { border-color: #6366f1; }
+  .sim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+  .sim-card {
+    background: #f8fafc; border-radius: 14px; padding: 20px;
+    border: 2px solid #e2e8f0;
+  }
+  .sim-card h4 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #334155; }
+  .sim-card .sim-sub { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+  .sim-card .sim-big { font-size: 32px; font-weight: 800; color: #6366f1; }
+  .sim-card .sim-detail { font-size: 13px; color: #64748b; margin-top: 6px; }
+  .sim-mix { margin-top: 20px; }
+  .sim-mix-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .sim-mix-row .mix-label { flex: 2 1 160px; font-size: 14px; font-weight: 600; color: #334155; }
+  .sim-mix-row .mix-input {
+    width: 80px; padding: 8px 10px; border: 2px solid #e2e8f0; border-radius: 8px;
+    font-size: 14px; text-align: right; outline: none; background: #f8fafc;
+  }
+  .sim-mix-row .mix-input:focus { border-color: #6366f1; }
+  .sim-mix-row .mix-result { font-size: 14px; font-weight: 600; color: #6366f1; min-width: 100px; }
+  .tax-result-box {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 16px; padding: 24px; color: #fff; margin-top: 24px;
+  }
+  .tax-result-box h3 { margin: 0 0 16px; font-size: 17px; font-weight: 700; }
+  .tax-result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+  .tax-result-item .tr-label { font-size: 11px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .tax-result-item .tr-value { font-size: 20px; font-weight: 700; }
+  @media (max-width: 600px) {
+    .stat-card { min-width: 100%; }
+    .chart-main, .chart-side, .info-box { flex: 1 1 100%; }
+    .target-input { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <h1>Freelance Tracker</h1>
+        <p class="subtitle">Regime Forfettario &middot; Gestione Separata INPS</p>
+      </div>
+      <div class="controls">
+        <select id="yearSelect"></select>
+        <button class="btn-header" onclick="toggleExport()">Dati</button>
+      </div>
+    </div>
+    <div class="export-bar" id="exportBar">
+      <button class="btn-export" onclick="exportJSON()">Esporta JSON</button>
+      <label class="btn-import">
+        Importa JSON
+        <input type="file" accept=".json" onchange="importJSON(event)" style="display:none">
+      </label>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-view="dashboard">Dashboard</button>
+      <button class="tab" data-view="inserimento">Inserimento</button>
+      <button class="tab" data-view="dettaglio">Dettaglio Tasse</button>
+      <button class="tab" data-view="obiettivi">Obiettivi</button>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="cards" id="kpiCards"></div>
+    <div class="profit-bar" id="profitBar"></div>
+    <div class="charts-row">
+      <div class="chart-box chart-main">
+        <h3>Andamento mensile</h3>
+        <canvas id="barChart" height="280"></canvas>
+      </div>
+      <div class="chart-box chart-side">
+        <h3>Ripartizione fatturato</h3>
+        <canvas id="pieIncome" height="220"></canvas>
+      </div>
+    </div>
+    <div class="chart-box" style="margin-bottom:24px">
+      <h3>Utile netto mensile (dopo tasse e spese)</h3>
+      <canvas id="lineChart" height="240"></canvas>
+    </div>
+    <div class="info-row">
+      <div class="chart-box chart-side">
+        <h3>Composizione tasse</h3>
+        <canvas id="pieTax" height="220"></canvas>
+      </div>
+      <div class="info-box">
+        <h3>Come vengono calcolate le tasse</h3>
+        <p id="infoFormula1"><strong style="color:#6366f1">1. Imponibile</strong> = Fatturato Consulenza &times; 78% + Fatturato Videocorsi &times; 67%</p>
+        <p><strong style="color:#f59e0b">2. INPS Gestione Separata</strong> = Imponibile &times; 26,07%</p>
+        <p id="infoFormula3"><strong style="color:#ef4444">3. Imposta sostitutiva</strong> = (Imponibile &minus; INPS) &times; 15%</p>
+        <p><strong style="color:#10b981">4. Saldo</strong> = Fatturato &minus; Spese (le tasse sono gi&agrave; incluse nelle spese quando le paghi)</p>
+        <p class="note">Nota: i contributi INPS versati l'anno precedente sono deducibili dall'imponibile. Questa app calcola una stima semplificata senza considerare i versamenti pregressi.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSERIMENTO -->
+  <div class="view" id="view-inserimento">
+    <div class="table-wrap">
+      <h2 id="insTitle"></h2>
+      <p class="desc">Inserisci il fatturato mensile per ogni attivit&agrave; e le spese sostenute</p>
+      <div class="scroll-x">
+        <table>
+          <thead>
+            <tr>
+              <th style="text-align:left">Mese</th>
+              <th style="text-align:right;color:#6366f1;min-width:120px">Consulenza (78%)</th>
+              <th style="text-align:right;color:#f59e0b;min-width:120px" id="insVidHeader">Videocorsi (67%)</th>
+              <th style="text-align:right;color:#ef4444;min-width:120px">Spese</th>
+              <th style="text-align:right">Totale</th>
+              <th style="text-align:right;color:#10b981">Saldo (Fat. - Spese)</th>
+            </tr>
+          </thead>
+          <tbody id="insBody"></tbody>
+          <tfoot id="insFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETTAGLIO -->
+  <div class="view" id="view-dettaglio">
+    <div class="table-wrap" style="margin-bottom:24px">
+      <h2 id="detTitle"></h2>
+      <p class="desc">Calcolo dettagliato delle imposte mese per mese</p>
+      <div class="scroll-x">
+        <table class="detail-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Mese</th>
+              <th style="text-align:right">Fatturato</th>
+              <th style="text-align:right">Imponibile</th>
+              <th style="text-align:right">INPS (26,07%)</th>
+              <th style="text-align:right" id="detImpSostHeader">Imp. Sost. (15%)</th>
+              <th style="text-align:right">Tot. Tasse</th>
+              <th style="text-align:right">Spese</th>
+              <th style="text-align:right">Saldo</th>
+            </tr>
+          </thead>
+          <tbody id="detBody"></tbody>
+          <tfoot id="detFoot"></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="summary-card" id="summaryCard"></div>
+  </div>
+
+  <!-- OBIETTIVI -->
+  <div class="view" id="view-obiettivi">
+    <div class="obj-section">
+      <h2>I tuoi prodotti e servizi</h2>
+      <p class="desc">Aggiungi i prodotti/servizi che vendi, con il prezzo e il tipo di attivit&agrave; (per calcolare le tasse corrette)</p>
+      <div id="prodList"></div>
+      <button class="btn-add" onclick="addProduct()">+ Aggiungi prodotto</button>
+    </div>
+
+    <div class="obj-section">
+      <h2>Obiettivo di fatturato annuale</h2>
+      <p class="desc">Quanto vuoi fatturare quest'anno? Inserisci il tuo obiettivo e scopri quanti clienti ti servono</p>
+      <input type="text" class="target-input" id="targetInput" placeholder="es. 50000" inputmode="decimal">
+      <div id="currentVsTarget" style="margin-top:12px;font-size:14px;color:#64748b"></div>
+    </div>
+
+    <div class="obj-section">
+      <h2>Simulatore: quanti clienti ti servono?</h2>
+      <p class="desc">Per ogni prodotto, vedi quanti ne dovresti vendere per raggiungere l'obiettivo. Oppure crea il tuo mix personalizzato.</p>
+
+      <h3 style="font-size:15px;font-weight:700;color:#475569;margin-bottom:16px">Se vendessi un solo prodotto</h3>
+      <div class="sim-grid" id="simSingle"></div>
+
+      <div class="sim-mix">
+        <h3 style="font-size:15px;font-weight:700;color:#475569;margin-bottom:12px">Crea il tuo mix</h3>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:16px">Inserisci quanti ne vuoi vendere per ogni prodotto e vedi se arrivi all'obiettivo</p>
+        <div id="simMixRows"></div>
+        <div id="simMixTotal" style="margin-top:16px"></div>
+      </div>
+    </div>
+
+    <div class="tax-result-box" id="taxResultBox" style="display:none">
+      <h3>Tasse stimate sull'obiettivo</h3>
+      <div class="tax-result-grid" id="taxResultGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const MONTHS = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+const SHORT = MONTHS.map(m => m.substring(0,3));
+const CY = new Date().getFullYear();
+const YEARS = Array.from({length:5},(_,i)=>CY-2+i);
+const INPS_RATE=0.2607, C1=0.78;
+// Parametri che cambiano in base all'anno
+function getYearParams(y){
+  if(y<=2025) return {tax:0.05, c2:0.40, taxLabel:"5%", c2Label:"40%"};
+  return {tax:0.15, c2:0.67, taxLabel:"15%", c2Label:"67%"};
+}
+const KEY = "freelance-tracker-data";
+
+const fmt = n => new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR"}).format(n||0);
+
+let data, year=CY, currentView="dashboard";
+let chartBar, chartLine, chartPieInc, chartPieTax;
+
+function emptyYear(){ return MONTHS.map(()=>({consulenza:0,videocorsi:0,spese:0})); }
+
+function load(){
+  try{ const r=localStorage.getItem(KEY); if(r) return JSON.parse(r); } catch(e){}
+  return null;
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(data)); } catch(e){} }
+
+function init(){
+  const saved=load();
+  if(saved&&saved.years){ data=saved; } else {
+    data={years:{}};
+    YEARS.forEach(y=>data.years[y]=emptyYear());
+  }
+  ensureProducts();
+  const sel=document.getElementById("yearSelect");
+  YEARS.forEach(y=>{
+    const o=document.createElement("option");
+    o.value=y; o.textContent=y; if(y===year) o.selected=true;
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change",e=>{ year=+e.target.value; ensureYear(); render(); });
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click",()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      currentView=t.dataset.view;
+      document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+      document.getElementById("view-"+currentView).classList.add("active");
+      render();
+    });
+  });
+  ensureYear();
+  render();
+}
+
+function ensureYear(){ if(!data.years[year]) data.years[year]=emptyYear(); }
+
+function calc(){
+  const yp=getYearParams(year);
+  const yd=data.years[year]||emptyYear();
+  const months=yd.map((m,i)=>{
+    const fat=m.consulenza+m.videocorsi;
+    const imp1=m.consulenza*C1, imp2=m.videocorsi*yp.c2;
+    const impTot=imp1+imp2;
+    const inps=impTot*INPS_RATE;
+    const base=Math.max(0,impTot-inps);
+    const impSost=base*yp.tax;
+    const tasse=inps+impSost;
+    const netto=fat-m.spese;
+    return {mese:SHORT[i],meseFull:MONTHS[i],consulenza:m.consulenza,videocorsi:m.videocorsi,
+      fatturato:fat,spese:m.spese,imp1,imp2,impTot,inps,impSost,tasse,netto};
+  });
+  const active=months.filter(m=>m.fatturato>0||m.spese>0).length||1;
+  const s=(k)=>months.reduce((a,m)=>a+m[k],0);
+  const totFat=s("fatturato"),totCon=s("consulenza"),totVid=s("videocorsi"),
+    totSpe=s("spese"),totImp=s("impTot"),totInps=s("inps"),
+    totImpSost=s("impSost"),totTasse=s("tasse"),totNetto=s("netto");
+  return {months,totFat,totCon,totVid,totSpe,totImp,totInps,totImpSost,totTasse,totNetto,
+    avgFat:totFat/active,avgSpe:totSpe/active,avgNet:totNetto/active,active,yp};
+}
+
+function render(){
+  const c=calc();
+  if(currentView==="dashboard") renderDashboard(c);
+  else if(currentView==="inserimento") renderInserimento(c);
+  else if(currentView==="dettaglio") renderDettaglio(c);
+  else if(currentView==="obiettivi") renderObiettivi(c);
+}
+
+function renderDashboard(c){
+  // KPI
+  document.getElementById("kpiCards").innerHTML=
+    card("Fatturato annuo",fmt(c.totFat),`Media ${fmt(c.avgFat)}/mese`,"#6366f1","💰")+
+    card("Spese annue",fmt(c.totSpe),`Media ${fmt(c.avgSpe)}/mese`,"#ef4444","🧾")+
+    card("Tasse totali",fmt(c.totTasse),`INPS ${fmt(c.totInps)} + Imp. ${fmt(c.totImpSost)}`,"#f59e0b","🏛️")+
+    card("Saldo (Fat. - Spese)",fmt(c.totNetto),`Media ${fmt(c.avgNet)}/mese`,c.totNetto>=0?"#10b981":"#ef4444",c.totNetto>=0?"✅":"⚠️");
+
+  // Profit
+  const pb=document.getElementById("profitBar");
+  const pos=c.totNetto>=0;
+  pb.style.background=pos?"#ecfdf5":"#fef2f2";
+  pb.innerHTML=`<span class="emoji">${pos?"📈":"📉"}</span><div>
+    <div class="title" style="color:${pos?"#065f46":"#991b1b"}">${pos?"Sei in guadagno!":"Attenzione: sei in perdita"}</div>
+    <div class="detail" style="color:${pos?"#047857":"#b91c1c"}">${pos
+      ?`Dopo le spese ti restano ${fmt(c.totNetto)} su ${c.active} mesi attivi`
+      :`Le spese superano il fatturato di ${fmt(Math.abs(c.totNetto))}`}</div></div>`;
+
+  // Update formulas
+  const yp=c.yp;
+  document.getElementById("infoFormula1").innerHTML=`<strong style="color:#6366f1">1. Imponibile</strong> = Fatturato Consulenza &times; 78% + Fatturato Videocorsi &times; ${yp.c2Label}`;
+  document.getElementById("infoFormula3").innerHTML=`<strong style="color:#ef4444">3. Imposta sostitutiva</strong> = (Imponibile &minus; INPS) &times; ${yp.taxLabel}`;
+
+  // Charts
+  renderBarChart(c);
+  renderLineChart(c);
+  renderPieIncome(c);
+  renderPieTax(c);
+}
+
+function card(label,value,sub,color,icon){
+  return `<div class="stat-card" style="--card-color:${color}">
+    <div class="label"><span class="icon">${icon}</span>${label}</div>
+    <div class="value">${value}</div>
+    <div class="sub">${sub}</div></div>`;
+}
+
+function renderBarChart(c){
+  const ctx=document.getElementById("barChart").getContext("2d");
+  if(chartBar) chartBar.destroy();
+  chartBar=new Chart(ctx,{type:"bar",data:{
+    labels:SHORT,
+    datasets:[
+      {label:"Consulenza",data:c.months.map(m=>m.consulenza),backgroundColor:"#6366f1",borderRadius:4},
+      {label:"Videocorsi",data:c.months.map(m=>m.videocorsi),backgroundColor:"#f59e0b",borderRadius:4},
+      {label:"Spese",data:c.months.map(m=>m.spese),backgroundColor:"#ef4444",borderRadius:4}
+    ]},options:{responsive:true,plugins:{tooltip:{callbacks:{label:i=>i.dataset.label+": "+fmt(i.raw)}}},
+    scales:{y:{ticks:{callback:v=>v>=1000?(v/1000)+"k":v}}}}});
+}
+
+function renderLineChart(c){
+  const ctx=document.getElementById("lineChart").getContext("2d");
+  if(chartLine) chartLine.destroy();
+  chartLine=new Chart(ctx,{type:"line",data:{
+    labels:SHORT,
+    datasets:[
+      {label:"Netto",data:c.months.map(m=>m.netto),borderColor:"#10b981",backgroundColor:"rgba(16,185,129,0.1)",
+        borderWidth:3,pointRadius:4,pointBackgroundColor:"#10b981",fill:true,tension:0.3},
+      {label:"Fatturato lordo",data:c.months.map(m=>m.fatturato),borderColor:"#6366f1",
+        borderWidth:2,borderDash:[5,5],pointRadius:0,fill:false,tension:0.3}
+    ]},options:{responsive:true,plugins:{tooltip:{callbacks:{label:i=>i.dataset.label+": "+fmt(i.raw)}}},
+    scales:{y:{ticks:{callback:v=>v>=1000?(v/1000)+"k":v}}}}});
+}
+
+function renderPieIncome(c){
+  const ctx=document.getElementById("pieIncome").getContext("2d");
+  if(chartPieInc) chartPieInc.destroy();
+  if(c.totCon===0&&c.totVid===0){
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.fillStyle="#94a3b8"; ctx.font="14px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("Nessun dato inserito",ctx.canvas.width/2,ctx.canvas.height/2);
+    return;
+  }
+  chartPieInc=new Chart(ctx,{type:"doughnut",data:{
+    labels:["Consulenza","Videocorsi"],
+    datasets:[{data:[c.totCon,c.totVid],backgroundColor:["#6366f1","#f59e0b"],borderWidth:0,spacing:4}]
+  },options:{responsive:true,cutout:"60%",plugins:{tooltip:{callbacks:{label:i=>i.label+": "+fmt(i.raw)}}}}});
+}
+
+function renderPieTax(c){
+  const ctx=document.getElementById("pieTax").getContext("2d");
+  if(chartPieTax) chartPieTax.destroy();
+  if(c.totInps===0&&c.totImpSost===0){
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+    ctx.fillStyle="#94a3b8"; ctx.font="14px sans-serif"; ctx.textAlign="center";
+    ctx.fillText("Nessun dato",ctx.canvas.width/2,ctx.canvas.height/2);
+    return;
+  }
+  const yp=getYearParams(year);
+  chartPieTax=new Chart(ctx,{type:"doughnut",data:{
+    labels:["INPS (26,07%)","Imp. Sost. ("+yp.taxLabel+")"],
+    datasets:[{data:[c.totInps,c.totImpSost],backgroundColor:["#f59e0b","#ef4444"],borderWidth:0,spacing:4}]
+  },options:{responsive:true,cutout:"60%",plugins:{tooltip:{callbacks:{label:i=>i.label+": "+fmt(i.raw)}}}}});
+}
+
+function renderInserimento(c){
+  const yd=data.years[year];
+  const yp=c.yp;
+  document.getElementById("insTitle").textContent=`Inserimento dati — ${year}`;
+  document.getElementById("insVidHeader").textContent=`Videocorsi (${yp.c2Label})`;
+  let html="";
+  MONTHS.forEach((mese,i)=>{
+    const m=c.months[i];
+    const nettoSemplice=m.fatturato-m.spese;
+    const nc=nettoSemplice>=0?"#10b981":"#ef4444";
+    html+=`<tr>
+      <td style="font-weight:600;font-size:13px;color:#334155">${mese}</td>
+      <td style="padding:4px 8px"><input class="input-cell" data-idx="${i}" data-field="consulenza" value="${yd[i].consulenza||""}" placeholder="0"></td>
+      <td style="padding:4px 8px"><input class="input-cell" data-idx="${i}" data-field="videocorsi" value="${yd[i].videocorsi||""}" placeholder="0"></td>
+      <td style="padding:4px 8px"><input class="input-cell" data-idx="${i}" data-field="spese" value="${yd[i].spese||""}" placeholder="0"></td>
+      <td style="text-align:right;font-weight:600;font-size:13px">${fmt(m.fatturato)}</td>
+      <td style="text-align:right;font-weight:700;font-size:13px;color:${nc}">${fmt(nettoSemplice)}</td>
+    </tr>`;
+  });
+  document.getElementById("insBody").innerHTML=html;
+  const totNettoSemplice=c.totFat-c.totSpe;
+  const nc2=totNettoSemplice>=0?"#10b981":"#ef4444";
+  document.getElementById("insFoot").innerHTML=`<tr>
+    <td style="font-weight:800;font-size:14px">Totale</td>
+    <td style="text-align:right;font-weight:700;color:#6366f1">${fmt(c.totCon)}</td>
+    <td style="text-align:right;font-weight:700;color:#f59e0b">${fmt(c.totVid)}</td>
+    <td style="text-align:right;font-weight:700;color:#ef4444">${fmt(c.totSpe)}</td>
+    <td style="text-align:right;font-weight:700">${fmt(c.totFat)}</td>
+    <td style="text-align:right;font-weight:800;font-size:15px;color:${nc2}">${fmt(totNettoSemplice)}</td>
+  </tr>`;
+
+  document.querySelectorAll("#insBody .input-cell").forEach(inp=>{
+    inp.addEventListener("blur",()=>{
+      const idx=+inp.dataset.idx, field=inp.dataset.field;
+      const val=parseFloat(inp.value.replace(",","."))||0;
+      inp.value=val||"";
+      data.years[year][idx][field]=val;
+      save(); render();
+    });
+    inp.addEventListener("keydown",e=>{
+      if(e.key==="Enter") inp.blur();
+    });
+  });
+}
+
+function renderDettaglio(c){
+  const yp=c.yp;
+  document.getElementById("detTitle").textContent=`Dettaglio tasse — ${year}`;
+  document.getElementById("detImpSostHeader").textContent=`Imp. Sost. (${yp.taxLabel})`;
+  let html="";
+  c.months.forEach((m,i)=>{
+    const nc=m.netto>=0?"#10b981":"#ef4444";
+    html+=`<tr>
+      <td style="font-weight:600;color:#334155">${m.meseFull}</td>
+      <td style="text-align:right">${fmt(m.fatturato)}</td>
+      <td style="text-align:right;color:#3b82f6">${fmt(m.impTot)}</td>
+      <td style="text-align:right;color:#f59e0b">${fmt(m.inps)}</td>
+      <td style="text-align:right;color:#ef4444">${fmt(m.impSost)}</td>
+      <td style="text-align:right;font-weight:600;color:#f59e0b">${fmt(m.tasse)}</td>
+      <td style="text-align:right;color:#ef4444">${fmt(m.spese)}</td>
+      <td style="text-align:right;font-weight:700;color:${nc}">${fmt(m.netto)}</td>
+    </tr>`;
+  });
+  document.getElementById("detBody").innerHTML=html;
+  const nc=c.totNetto>=0?"#10b981":"#ef4444";
+  document.getElementById("detFoot").innerHTML=`<tr>
+    <td style="font-weight:800">Totale</td>
+    <td style="text-align:right;font-weight:700">${fmt(c.totFat)}</td>
+    <td style="text-align:right;font-weight:700;color:#3b82f6">${fmt(c.totImp)}</td>
+    <td style="text-align:right;font-weight:700;color:#f59e0b">${fmt(c.totInps)}</td>
+    <td style="text-align:right;font-weight:700;color:#ef4444">${fmt(c.totImpSost)}</td>
+    <td style="text-align:right;font-weight:800;color:#f59e0b">${fmt(c.totTasse)}</td>
+    <td style="text-align:right;font-weight:700;color:#ef4444">${fmt(c.totSpe)}</td>
+    <td style="text-align:right;font-weight:800;font-size:15px;color:${nc}">${fmt(c.totNetto)}</td>
+  </tr>`;
+
+  const taxRate=c.totFat>0?((c.totTasse/c.totFat)*100).toFixed(1)+"%":"—";
+  const items=[
+    ["Fatturato lordo",fmt(c.totFat)],["Imponibile totale",fmt(c.totImp)],
+    ["INPS Gestione Separata",fmt(c.totInps)],["Imposta sostitutiva",fmt(c.totImpSost)],
+    ["Totale tasse",fmt(c.totTasse)],["Spese sostenute",fmt(c.totSpe)],
+    ["Saldo (Fat. - Spese)",fmt(c.totNetto)],["Tax rate effettivo",taxRate]
+  ];
+  document.getElementById("summaryCard").innerHTML=
+    `<h3>Riepilogo annuale ${year}</h3><div class="summary-grid">${
+      items.map(([l,v])=>`<div class="summary-item"><div class="slabel">${l}</div><div class="svalue">${v}</div></div>`).join("")
+    }</div>`;
+}
+
+function toggleExport(){
+  document.getElementById("exportBar").classList.toggle("active");
+}
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`freelance-tracker-${year}.json`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importJSON(e){
+  const file=e.target.files[0]; if(!file) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const imp=JSON.parse(ev.target.result);
+      if(imp.years){ data=imp; save(); render(); document.getElementById("exportBar").classList.remove("active"); }
+    }catch(e){}
+  };
+  r.readAsText(file);
+}
+
+// ─── OBIETTIVI ───
+
+function ensureProducts(){
+  if(!data.products) data.products=[
+    {name:"",price:0,type:"consulenza"}
+  ];
+  if(!data.target) data.target=0;
+  if(!data.mix) data.mix={};
+}
+
+function addProduct(){
+  ensureProducts();
+  data.products.push({name:"",price:0,type:"consulenza"});
+  save(); render();
+}
+
+function removeProduct(idx){
+  ensureProducts();
+  data.products.splice(idx,1);
+  if(data.products.length===0) data.products.push({name:"",price:0,type:"consulenza"});
+  save(); render();
+}
+
+function updateProduct(idx,field,val){
+  ensureProducts();
+  if(field==="price") val=parseFloat(String(val).replace(",","."))||0;
+  data.products[idx][field]=val;
+  save(); renderObiettivi(calc());
+}
+
+function updateTarget(val){
+  ensureProducts();
+  data.target=parseFloat(String(val).replace(",","."))||0;
+  save(); renderObiettivi(calc());
+}
+
+function updateMix(idx,val){
+  ensureProducts();
+  data.mix[idx]=parseInt(val)||0;
+  save(); renderObiettivi(calc());
+}
+
+function calcTaxOnRevenue(revenue, products){
+  const yp=getYearParams(year);
+  let totCons=0, totVid=0;
+  if(products){
+    products.forEach(p=>{
+      if(p.type==="consulenza") totCons+=p.rev||0;
+      else totVid+=p.rev||0;
+    });
+  } else {
+    totCons=revenue*0.5;
+    totVid=revenue*0.5;
+  }
+  const impCons=totCons*C1;
+  const impVid=totVid*yp.c2;
+  const impTot=impCons+impVid;
+  const inps=impTot*INPS_RATE;
+  const base=Math.max(0,impTot-inps);
+  const impSost=base*yp.tax;
+  const tasse=inps+impSost;
+  return {impTot,inps,impSost,tasse,aliquotaEff:revenue>0?((tasse/revenue)*100).toFixed(1):0,yp};
+}
+
+function renderObiettivi(c){
+  ensureProducts();
+  const yp=c.yp;
+  const prods=data.products;
+  const target=data.target||0;
+
+  // Render products list
+  let prodHtml="";
+  prods.forEach((p,i)=>{
+    prodHtml+=`<div class="prod-row">
+      <input class="prod-name" placeholder="Nome prodotto/servizio" value="${p.name}" onchange="updateProduct(${i},'name',this.value)">
+      <input class="prod-price" placeholder="Prezzo" value="${p.price||''}" inputmode="decimal" onchange="updateProduct(${i},'price',this.value)">
+      <select class="prod-type" onchange="updateProduct(${i},'type',this.value)">
+        <option value="consulenza" ${p.type==="consulenza"?"selected":""}>Consulenza (78%)</option>
+        <option value="videocorsi" ${p.type==="videocorsi"?"selected":""}>Videocorsi (${yp.c2Label})</option>
+      </select>
+      ${prods.length>1?`<button class="btn-remove" onclick="removeProduct(${i})">✕</button>`:""}
+    </div>`;
+  });
+  document.getElementById("prodList").innerHTML=prodHtml;
+
+  // Target input
+  const ti=document.getElementById("targetInput");
+  if(document.activeElement!==ti) ti.value=target||"";
+
+  // Current vs target
+  const cvt=document.getElementById("currentVsTarget");
+  if(target>0){
+    const diff=target-c.totFat;
+    const perc=c.totFat>0?((c.totFat/target)*100).toFixed(0):0;
+    if(diff>0){
+      cvt.innerHTML=`Hai fatturato <strong style="color:#6366f1">${fmt(c.totFat)}</strong> finora nel ${year} — ti mancano <strong style="color:#f59e0b">${fmt(diff)}</strong> per raggiungere l'obiettivo (${perc}%)`;
+    } else {
+      cvt.innerHTML=`Hai gi&agrave; superato l'obiettivo! Fatturato: <strong style="color:#10b981">${fmt(c.totFat)}</strong> su ${fmt(target)} (+${fmt(Math.abs(diff))})`;
+    }
+  } else {
+    cvt.innerHTML="";
+  }
+
+  // Single product simulation
+  const validProds=prods.filter(p=>p.price>0&&p.name);
+  let singleHtml="";
+  if(target>0&&validProds.length>0){
+    validProds.forEach(p=>{
+      const needed=Math.ceil(target/p.price);
+      singleHtml+=`<div class="sim-card">
+        <h4>${p.name}</h4>
+        <div class="sim-sub">${fmt(p.price)} / unit&agrave; &middot; ${p.type==="consulenza"?"Consulenza 78%":"Videocorsi "+yp.c2Label}</div>
+        <div class="sim-big">${needed} vendite</div>
+        <div class="sim-detail">per raggiungere ${fmt(target)} di fatturato</div>
+        <div class="sim-detail" style="margin-top:4px;color:#94a3b8">${needed} &times; ${fmt(p.price)} = ${fmt(needed*p.price)}</div>
+      </div>`;
+    });
+  } else if(target===0){
+    singleHtml=`<p style="color:#94a3b8;font-size:14px">Inserisci un obiettivo di fatturato per vedere la simulazione</p>`;
+  } else {
+    singleHtml=`<p style="color:#94a3b8;font-size:14px">Aggiungi almeno un prodotto con nome e prezzo</p>`;
+  }
+  document.getElementById("simSingle").innerHTML=singleHtml;
+
+  // Mix simulation
+  let mixHtml="";
+  let mixTotal=0;
+  let mixProducts=[];
+  if(validProds.length>0){
+    validProds.forEach((p,i)=>{
+      const qty=data.mix[i]||0;
+      const subtot=qty*p.price;
+      mixTotal+=subtot;
+      mixProducts.push({type:p.type,rev:subtot});
+      mixHtml+=`<div class="sim-mix-row">
+        <span class="mix-label">${p.name} <span style="color:#94a3b8;font-weight:400">(${fmt(p.price)})</span></span>
+        <input class="mix-input" type="number" min="0" value="${qty||''}" placeholder="0" oninput="updateMix(${i},this.value)">
+        <span class="mix-result">${fmt(subtot)}</span>
+      </div>`;
+    });
+  } else {
+    mixHtml=`<p style="color:#94a3b8;font-size:14px">Aggiungi almeno un prodotto con nome e prezzo</p>`;
+  }
+  document.getElementById("simMixRows").innerHTML=mixHtml;
+
+  // Mix total
+  const mixEl=document.getElementById("simMixTotal");
+  if(validProds.length>0){
+    const diff=target>0?mixTotal-target:0;
+    const progressPerc=target>0?Math.min(100,((mixTotal/target)*100).toFixed(0)):0;
+    const barColor=mixTotal>=target&&target>0?"#10b981":"#6366f1";
+    mixEl.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <span style="font-size:18px;font-weight:700;color:#1e293b">Totale mix: ${fmt(mixTotal)}</span>
+        ${target>0?`<span style="font-size:14px;font-weight:600;color:${diff>=0?"#10b981":"#f59e0b"}">${diff>=0?"+":""}${fmt(diff)} vs obiettivo</span>`:""}
+      </div>
+      ${target>0?`<div style="background:#e2e8f0;border-radius:8px;height:10px;overflow:hidden">
+        <div style="background:${barColor};height:100%;width:${progressPerc}%;border-radius:8px;transition:width 0.3s"></div>
+      </div>
+      <div style="text-align:right;font-size:12px;color:#94a3b8;margin-top:4px">${progressPerc}% dell'obiettivo</div>`:""}`;
+  } else {
+    mixEl.innerHTML="";
+  }
+
+  // Tax estimation on target or mix
+  const taxBox=document.getElementById("taxResultBox");
+  const taxGrid=document.getElementById("taxResultGrid");
+  const revForTax=mixTotal>0?mixTotal:target;
+  if(revForTax>0){
+    const prodsForTax=mixTotal>0?mixProducts:validProds.map(p=>({type:p.type,rev:revForTax/validProds.length}));
+    const tx=calcTaxOnRevenue(revForTax,prodsForTax);
+    taxBox.style.display="block";
+    const label=mixTotal>0?"sul tuo mix":"sull'obiettivo di "+fmt(target);
+    taxGrid.innerHTML=`
+      <div class="tax-result-item"><div class="tr-label">Fatturato ${label}</div><div class="tr-value">${fmt(revForTax)}</div></div>
+      <div class="tax-result-item"><div class="tr-label">Imponibile</div><div class="tr-value">${fmt(tx.impTot)}</div></div>
+      <div class="tax-result-item"><div class="tr-label">INPS (26,07%)</div><div class="tr-value">${fmt(tx.inps)}</div></div>
+      <div class="tax-result-item"><div class="tr-label">Imposta sost. (${tx.yp.taxLabel})</div><div class="tr-value">${fmt(tx.impSost)}</div></div>
+      <div class="tax-result-item"><div class="tr-label">Totale tasse stimate</div><div class="tr-value">${fmt(tx.tasse)}</div></div>
+      <div class="tax-result-item"><div class="tr-label">Tax rate effettivo</div><div class="tr-value">${tx.aliquotaEff}%</div></div>
+      <div class="tax-result-item"><div class="tr-label">Ti resta dopo le tasse</div><div class="tr-value">${fmt(revForTax-tx.tasse)}</div></div>
+    `;
+  } else {
+    taxBox.style.display="none";
+  }
+}
+
+// Target input listener
+document.getElementById("targetInput").addEventListener("blur",function(){
+  updateTarget(this.value);
+});
+document.getElementById("targetInput").addEventListener("keydown",function(e){
+  if(e.key==="Enter") this.blur();
+});
+
+init();
+</script>
+</body>
+</html>
