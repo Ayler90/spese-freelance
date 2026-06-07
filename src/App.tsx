@@ -1,122 +1,110 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useCallback } from 'react';
+import { YEARS, loadData, saveData, calc } from './store';
+import type { AppData, TabId } from './types';
+import Dashboard from './components/Dashboard';
+import Inserimento from './components/Inserimento';
+import Dettaglio from './components/Dettaglio';
+import Obiettivi from './components/Obiettivi';
 
-function App() {
-  const [count, setCount] = useState(0)
+const CY = new Date().getFullYear();
+
+export default function App() {
+  const [data, setData] = useState<AppData>(() => loadData());
+  const [year, setYear] = useState<number>(CY);
+  const [tab, setTab] = useState<TabId>('dashboard');
+  const [showExport, setShowExport] = useState(false);
+
+  const updateData = useCallback((next: AppData) => {
+    setData(next);
+    saveData(next);
+  }, []);
+
+  const c = calc(data, year);
+
+  const handleExportJSON = () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `freelance-tracker-${year}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const handleImportJSON = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = (ev) => {
+      try {
+        const imp = JSON.parse(ev.target?.result as string) as AppData;
+        if (imp.years) {
+          updateData(imp);
+          setShowExport(false);
+        }
+      } catch { /* ignore */ }
+    };
+    r.readAsText(file);
+    e.target.value = '';
+  };
+
+  const TABS: { id: TabId; label: string }[] = [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'inserimento', label: 'Inserimento' },
+    { id: 'dettaglio', label: 'Dettaglio Tasse' },
+    { id: 'obiettivi', label: 'Obiettivi' },
+  ];
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <div className="header">
+        <div className="header-inner">
+          <div className="header-top">
+            <div>
+              <h1>Freelance Tracker</h1>
+              <p className="subtitle">Regime Forfettario &middot; Gestione Separata INPS</p>
+            </div>
+            <div className="controls">
+              <select
+                className="year-select"
+                value={year}
+                onChange={e => setYear(Number(e.target.value))}
+              >
+                {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+              <button className="btn-header" onClick={() => setShowExport(v => !v)}>Dati</button>
+            </div>
+          </div>
 
-      <div className="ticks"></div>
+          {showExport && (
+            <div className="export-bar">
+              <button className="btn-export" onClick={handleExportJSON}>Esporta JSON</button>
+              <label className="btn-import">
+                Importa JSON
+                <input type="file" accept=".json" onChange={handleImportJSON} style={{ display: 'none' }} />
+              </label>
+            </div>
+          )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <div className="tabs">
+            {TABS.map(t => (
+              <button
+                key={t.id}
+                className={`tab${tab === t.id ? ' active' : ''}`}
+                onClick={() => setTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      <div className="content">
+        {tab === 'dashboard' && <Dashboard c={c} />}
+        {tab === 'inserimento' && <Inserimento data={data} year={year} c={c} onUpdate={updateData} />}
+        {tab === 'dettaglio' && <Dettaglio c={c} year={year} />}
+        {tab === 'obiettivi' && <Obiettivi data={data} year={year} c={c} onUpdate={updateData} />}
+      </div>
     </>
-  )
+  );
 }
-
-export default App
