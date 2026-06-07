@@ -35,7 +35,7 @@ export default function Inserimento({ data, year, c, onUpdate }: Props) {
           <thead>
             <tr>
               <th style={{ textAlign: 'left' }}>Mese</th>
-              <th style={{ textAlign: 'right', color: '#6366f1', minWidth: 120 }}>Consulenza (78%)</th>
+              <th style={{ textAlign: 'right', color: '#156686', minWidth: 120 }}>Consulenza (78%)</th>
               <th style={{ textAlign: 'right', color: '#f59e0b', minWidth: 120 }}>
                 Videocorsi ({c.yp.c2Label})
               </th>
@@ -79,7 +79,7 @@ export default function Inserimento({ data, year, c, onUpdate }: Props) {
           <tfoot>
             <tr>
               <td style={{ fontWeight: 800, fontSize: 14 }}>Totale</td>
-              <td style={{ textAlign: 'right', fontWeight: 700, color: '#6366f1' }}>{fmt(c.totCon)}</td>
+              <td style={{ textAlign: 'right', fontWeight: 700, color: '#156686' }}>{fmt(c.totCon)}</td>
               <td style={{ textAlign: 'right', fontWeight: 700, color: '#f59e0b' }}>{fmt(c.totVid)}</td>
               <td style={{ textAlign: 'right', fontWeight: 700, color: '#ef4444' }}>{fmt(c.totSpe)}</td>
               <td style={{ textAlign: 'right', fontWeight: 700 }}>{fmt(c.totFat)}</td>

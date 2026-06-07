@@ -26,7 +26,7 @@ export default function Dashboard({ c }: Props) {
   const barData = {
     labels: SHORT,
     datasets: [
-      { label: 'Consulenza', data: c.months.map(m => m.consulenza), backgroundColor: '#6366f1', borderRadius: 4 },
+      { label: 'Consulenza', data: c.months.map(m => m.consulenza), backgroundColor: '#156686', borderRadius: 4 },
       { label: 'Videocorsi', data: c.months.map(m => m.videocorsi), backgroundColor: '#f59e0b', borderRadius: 4 },
       { label: 'Spese', data: c.months.map(m => m.spese), backgroundColor: '#ef4444', borderRadius: 4 },
     ]
@@ -48,7 +48,7 @@ export default function Dashboard({ c }: Props) {
       },
       {
         label: 'Fatturato lordo', data: c.months.map(m => m.fatturato),
-        borderColor: '#6366f1', borderWidth: 2, borderDash: [5, 5],
+        borderColor: '#156686', borderWidth: 2, borderDash: [5, 5],
         pointRadius: 0, fill: false, tension: 0.3
       }
     ]
@@ -63,7 +63,7 @@ export default function Dashboard({ c }: Props) {
   const hasIncome = c.totCon > 0 || c.totVid > 0;
   const pieIncData = {
     labels: ['Consulenza', 'Videocorsi'],
-    datasets: [{ data: [c.totCon, c.totVid], backgroundColor: ['#6366f1', '#f59e0b'], borderWidth: 0, spacing: 4 }]
+    datasets: [{ data: [c.totCon, c.totVid], backgroundColor: ['#156686', '#f59e0b'], borderWidth: 0, spacing: 4 }]
   };
   const pieIncOptions: ChartOptions<'doughnut'> = {
     responsive: true,
@@ -86,7 +86,7 @@ export default function Dashboard({ c }: Props) {
     <div>
       {/* KPI cards */}
       <div className="cards">
-        <StatCard label="Fatturato annuo" value={fmt(c.totFat)} sub={`Media ${fmt(c.avgFat)}/mese`} color="#6366f1" icon="💰" />
+        <StatCard label="Fatturato annuo" value={fmt(c.totFat)} sub={`Media ${fmt(c.avgFat)}/mese`} color="#156686" icon="💰" />
         <StatCard label="Spese annue" value={fmt(c.totSpe)} sub={`Media ${fmt(c.avgSpe)}/mese`} color="#ef4444" icon="🧾" />
         <StatCard label="Tasse totali" value={fmt(c.totTasse)} sub={`INPS ${fmt(c.totInps)} + Imp. ${fmt(c.totImpSost)}`} color="#f59e0b" icon="🏛️" />
         <StatCard
@@ -142,7 +142,7 @@ export default function Dashboard({ c }: Props) {
         <div className="info-box">
           <h3>Come vengono calcolate le tasse</h3>
           <p>
-            <strong style={{ color: '#6366f1' }}>1. Imponibile</strong>{' '}
+            <strong style={{ color: '#156686' }}>1. Imponibile</strong>{' '}
             = Fatturato Consulenza &times; 78% + Fatturato Videocorsi &times; {c.yp.c2Label}
           </p>
           <p>

@@ -126,7 +126,7 @@ export default function Obiettivi({ data, year, c, onUpdate }: Props) {
         {target > 0 && (
           <div style={{ marginTop: 12, fontSize: 14, color: '#64748b' }}>
             {target - c.totFat > 0
-              ? <>Hai fatturato <strong style={{ color: '#6366f1' }}>{fmt(c.totFat)}</strong> finora nel {year} — ti mancano <strong style={{ color: '#f59e0b' }}>{fmt(target - c.totFat)}</strong> per raggiungere l'obiettivo ({c.totFat > 0 ? ((c.totFat / target) * 100).toFixed(0) : 0}%)</>
+              ? <>Hai fatturato <strong style={{ color: '#156686' }}>{fmt(c.totFat)}</strong> finora nel {year} — ti mancano <strong style={{ color: '#f59e0b' }}>{fmt(target - c.totFat)}</strong> per raggiungere l'obiettivo ({c.totFat > 0 ? ((c.totFat / target) * 100).toFixed(0) : 0}%)</>
               : <>Hai già superato l'obiettivo! Fatturato: <strong style={{ color: '#10b981' }}>{fmt(c.totFat)}</strong> su {fmt(target)} (+{fmt(Math.abs(target - c.totFat))})</>
             }
           </div>
@@ -209,7 +209,7 @@ export default function Obiettivi({ data, year, c, onUpdate }: Props) {
                   <>
                     <div style={{ background: '#e2e8f0', borderRadius: 8, height: 10, overflow: 'hidden' }}>
                       <div style={{
-                        background: mixTotal >= target ? '#10b981' : '#6366f1',
+                        background: mixTotal >= target ? '#10b981' : '#156686',
                         height: '100%',
                         width: `${Math.min(100, (mixTotal / target) * 100).toFixed(0)}%`,
                         borderRadius: 8,

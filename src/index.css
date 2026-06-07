@@ -1,12 +1,12 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #fff1f2 100%);
+  background: linear-gradient(135deg, #eef6f7 0%, #f5fafb 50%, #ffffff 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: #1e293b;
 }
 .header {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #156686 0%, #0d4f66 100%);
   padding: 32px 24px 24px;
   color: #fff;
 }
@@ -31,7 +31,7 @@ body {
 }
 .btn-export {
   padding: 8px 20px; border-radius: 8px; border: none;
-  background: #fff; color: #6366f1; font-weight: 600;
+  background: #fff; color: #156686; font-weight: 600;
   cursor: pointer; font-size: 13px;
 }
 .btn-import {
@@ -51,7 +51,7 @@ body {
   background: transparent; color: rgba(255,255,255,0.75);
   transition: all 0.2s;
 }
-.tab.active { background: #6366f1; color: #fff; }
+.tab.active { background: #156686; color: #fff; }
 .content { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
 .cards { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
 .stat-card {
@@ -105,18 +105,18 @@ body {
 table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
 th {
   padding: 12px 8px; font-size: 12px; color: #94a3b8; font-weight: 600;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #C4D9DC;
 }
 td { padding: 8px; }
-tbody tr:nth-child(even) { background: #fafbfc; }
-tfoot td { padding: 12px 8px; font-weight: 700; border-top: 2px solid #e2e8f0; }
+tbody tr:nth-child(even) { background: #f2f8f9; }
+tfoot td { padding: 12px 8px; font-weight: 700; border-top: 2px solid #C4D9DC; }
 .input-cell {
   width: 100%; padding: 8px 10px;
-  border: 2px solid #e2e8f0; border-radius: 8px;
+  border: 2px solid #C4D9DC; border-radius: 8px;
   font-size: 14px; text-align: right; outline: none;
-  background: #f8fafc; transition: border 0.2s; box-sizing: border-box;
+  background: #f0f7f8; transition: border 0.2s; box-sizing: border-box;
 }
-.input-cell:focus { border-color: #6366f1; }
+.input-cell:focus { border-color: #156686; }
 .detail-table th {
   padding: 12px 6px; font-size: 11px; text-transform: uppercase;
   letter-spacing: 0.3px; white-space: nowrap;
@@ -124,7 +124,7 @@ tfoot td { padding: 12px 8px; font-weight: 700; border-top: 2px solid #e2e8f0; }
 .detail-table td { padding: 10px 6px; font-size: 13px; }
 .detail-table tfoot td { padding: 12px 6px; }
 .summary-card {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #156686 0%, #0d4f66 100%);
   border-radius: 16px; padding: 28px; color: #fff; margin-top: 24px;
 }
 .summary-card h3 { margin: 0 0 20px; font-size: 18px; font-weight: 700; }
@@ -139,10 +139,10 @@ canvas { max-width: 100%; }
 .obj-section .desc { margin: 0 0 20px; font-size: 13px; color: #94a3b8; }
 .prod-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
 .prod-row input, .prod-row select {
-  padding: 8px 10px; border: 2px solid #e2e8f0; border-radius: 8px;
-  font-size: 14px; outline: none; background: #f8fafc; transition: border 0.2s;
+  padding: 8px 10px; border: 2px solid #C4D9DC; border-radius: 8px;
+  font-size: 14px; outline: none; background: #f0f7f8; transition: border 0.2s;
 }
-.prod-row input:focus, .prod-row select:focus { border-color: #6366f1; }
+.prod-row input:focus, .prod-row select:focus { border-color: #156686; }
 .prod-name { flex: 2 1 160px; min-width: 120px; }
 .prod-price { flex: 1 1 100px; min-width: 80px; text-align: right; }
 .prod-type { flex: 1 1 140px; min-width: 120px; color: #1e293b; }
@@ -150,36 +150,36 @@ canvas { max-width: 100%; }
   padding: 8px 16px; border: none; border-radius: 8px;
   font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
 }
-.btn-add { background: #6366f1; color: #fff; }
-.btn-add:hover { background: #4f46e5; }
+.btn-add { background: #156686; color: #fff; }
+.btn-add:hover { background: #0d4f66; }
 .btn-remove { background: #fee2e2; color: #ef4444; padding: 8px 12px; }
 .btn-remove:hover { background: #fecaca; }
 .target-input {
-  padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 10px;
+  padding: 12px 16px; border: 2px solid #C4D9DC; border-radius: 10px;
   font-size: 20px; font-weight: 700; text-align: right; outline: none;
-  background: #f8fafc; width: 250px; max-width: 100%; transition: border 0.2s;
+  background: #f0f7f8; width: 250px; max-width: 100%; transition: border 0.2s;
 }
-.target-input:focus { border-color: #6366f1; }
+.target-input:focus { border-color: #156686; }
 .sim-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
 .sim-card {
-  background: #f8fafc; border-radius: 14px; padding: 20px;
-  border: 2px solid #e2e8f0;
+  background: #f0f7f8; border-radius: 14px; padding: 20px;
+  border: 2px solid #C4D9DC;
 }
 .sim-card h4 { margin: 0 0 4px; font-size: 15px; font-weight: 700; color: #334155; }
 .sim-card .sim-sub { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
-.sim-card .sim-big { font-size: 32px; font-weight: 800; color: #6366f1; }
+.sim-card .sim-big { font-size: 32px; font-weight: 800; color: #156686; }
 .sim-card .sim-detail { font-size: 13px; color: #64748b; margin-top: 6px; }
 .sim-mix { margin-top: 20px; }
 .sim-mix-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
 .mix-label { flex: 2 1 160px; font-size: 14px; font-weight: 600; color: #334155; }
 .mix-input {
-  width: 80px; padding: 8px 10px; border: 2px solid #e2e8f0; border-radius: 8px;
-  font-size: 14px; text-align: right; outline: none; background: #f8fafc;
+  width: 80px; padding: 8px 10px; border: 2px solid #C4D9DC; border-radius: 8px;
+  font-size: 14px; text-align: right; outline: none; background: #f0f7f8;
 }
-.mix-input:focus { border-color: #6366f1; }
-.mix-result { font-size: 14px; font-weight: 600; color: #6366f1; min-width: 100px; }
+.mix-input:focus { border-color: #156686; }
+.mix-result { font-size: 14px; font-weight: 600; color: #156686; min-width: 100px; }
 .tax-result-box {
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #156686 0%, #0d4f66 100%);
   border-radius: 16px; padding: 24px; color: #fff; margin-top: 24px;
 }
 .tax-result-box h3 { margin: 0 0 16px; font-size: 17px; font-weight: 700; }
